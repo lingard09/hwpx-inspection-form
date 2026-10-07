@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>검수확인서 만들기 · 초기창업패키지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --desk:#E4E8EE; --panel:#FFFFFF; --ink:#18202E; --muted:#5A6476;
+  --line:#CBD1DB; --line-soft:#E3E7ED; --blue:#1D3FB8; --blue-wash:#EEF2FD;
+  --danger:#B42318; --ok:#1E7B4A;
+  --ui:"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --paper:"Noto Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--desk);color:var(--ink);font-family:var(--ui);font-size:15px;line-height:1.55}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.top{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;padding:22px 28px 14px;max-width:1440px;margin:0 auto}
+.top h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-0.01em}
+.top p{margin:0;color:var(--muted);font-size:14px}
+
+.wrap{display:grid;grid-template-columns:minmax(360px,520px) 1fr;gap:28px;max-width:1440px;margin:0 auto;padding:0 28px 48px;align-items:start}
+@media (max-width:980px){.wrap{grid-template-columns:minmax(0,1fr);padding:0 14px 40px}.top{padding:18px 14px 10px}}
+
+/* ---------- form side ---------- */
+.form{display:flex;flex-direction:column;gap:18px}
+.block{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px 18px 20px}
+.block h2{margin:0 0 14px;font-size:16px;font-weight:600}
+.block h2 small{font-weight:400;color:var(--muted);font-size:13px;margin-left:6px}
+.field{display:grid;grid-template-columns:118px 1fr;align-items:center;gap:10px;margin-bottom:10px}
+.field:last-child{margin-bottom:0}
+.field label{font-size:14px;color:var(--muted)}
+.field input,.field textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:4px;padding:8px 10px;background:#fff}
+.field textarea{resize:vertical;min-height:62px}
+.field input::placeholder,.field textarea::placeholder{color:#9AA3B2}
+.field .hint{grid-column:2;font-size:12.5px;color:var(--muted);margin-top:-4px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.field{grid-template-columns:1fr;gap:4px}.field .hint{grid-column:1}}
+
+.items{display:flex;flex-direction:column;gap:12px}
+.item{border:1px solid var(--line-soft);border-radius:5px;padding:12px;background:#FBFCFD}
+.item-head{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.item-no{font-weight:600;font-size:13px;color:var(--blue);min-width:22px}
+.item-head input{flex:1;border:1px solid var(--line);border-radius:4px;padding:7px 10px;background:#fff}
+.icon-btn{border:1px solid var(--line);background:#fff;border-radius:4px;width:32px;height:32px;cursor:pointer;color:var(--muted);display:grid;place-items:center;flex:none}
+.icon-btn:hover{color:var(--ink);border-color:#9AA3B2}
+.icon-btn.del:hover{color:var(--danger);border-color:var(--danger)}
+.icon-btn:disabled{opacity:.35;cursor:default}
+.photos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.drop{position:relative;aspect-ratio:4/3;border:1.5px dashed var(--line);border-radius:4px;background:#fff;display:grid;place-items:center;text-align:center;cursor:pointer;overflow:hidden;color:var(--muted);font-size:13px;padding:6px}
+.drop:hover,.drop.over{border-color:var(--blue);color:var(--blue);background:var(--blue-wash)}
+.drop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.drop .clear{position:absolute;top:4px;right:4px;z-index:2;width:24px;height:24px;border-radius:3px;border:0;background:rgba(24,32,46,.75);color:#fff;cursor:pointer;font-size:14px;line-height:1}
+.drop input{display:none}
+.add{margin-top:12px;width:100%;border:1px dashed var(--blue);color:var(--blue);background:var(--blue-wash);border-radius:5px;padding:10px;cursor:pointer;font-weight:500}
+.add:hover{background:#E2E9FC}
+
+.actions{position:sticky;bottom:0;background:linear-gradient(to top,var(--desk) 70%,rgba(228,232,238,0));padding:14px 0 calc(6px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px}
+.primary{border:0;background:var(--blue);color:#fff;border-radius:6px;padding:14px 18px;font-size:16px;font-weight:600;cursor:pointer}
+.primary:hover{background:#16329A}
+.primary:disabled{background:#8C9BC9;cursor:progress}
+.status{font-size:13.5px;color:var(--muted);min-height:1.4em}
+.status.err{color:var(--danger)}
+.status.ok{color:var(--ok)}
+.reset{align-self:flex-start;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0;font-size:13px}
+
+/* ---------- paper preview ---------- */
+.preview{position:sticky;top:16px}
+.preview-cap{font-size:13px;color:var(--muted);margin:0 0 8px}
+.sheets{display:flex;flex-direction:column;gap:18px;max-height:calc(100vh - 70px);overflow:auto;padding:2px 2px 20px}
+@media (max-width:980px){.preview{position:static}.sheets{max-height:none}}
+.sheet{flex:none;background:#fff;width:100%;max-width:640px;aspect-ratio:210/297;margin:0 auto;box-shadow:0 1px 2px rgba(24,32,46,.08),0 8px 24px rgba(24,32,46,.08);padding:4.8% 7.2%;font-family:var(--paper);color:#000;container-type:inline-size;overflow:hidden}
+.sheet table{width:100%;border-collapse:collapse;table-layout:fixed}
+.sheet td{padding:.6cqw 1.2cqw;vertical-align:middle;word-break:keep-all;overflow-wrap:anywhere}
+.p-top td{font-size:2.15cqw;font-weight:700;padding:.4cqw 1.2cqw}
+.p-title{border:.5cqw solid #000;text-align:center;padding:1.6cqw 0 1.8cqw}
+.p-title .a{font-size:2.7cqw;font-weight:700}
+.p-title .b{font-size:4.1cqw;font-weight:900;letter-spacing:.5em;margin-right:-.5em}
+.p-info{margin-top:1.4cqw;border:.4cqw solid #000}
+.p-info td{border:.12cqw solid #000;font-size:1.85cqw;height:5.4cqw;padding:.5cqw 1cqw}
+.p-info td.k{font-weight:700;text-align:center;width:14%;line-height:1.25;padding:.5cqw .3cqw;word-break:keep-all;overflow-wrap:normal}
+.p-info td.c{text-align:center}
+.ph{margin-top:1.4cqw}
+.ph td{border:.5cqw solid #000}
+.ph .h{text-align:center;font-weight:700;font-size:2.15cqw;height:4cqw}
+.ph .pic{height:34cqw;padding:.6cqw;text-align:center}
+.ph .pic img{max-width:100%;max-height:32cqw;display:block;margin:0 auto}
+.ph .pic .none{color:#9AA3B2;font-size:1.8cqw}
+.ph .cap{font-weight:700;font-size:2cqw;height:4.2cqw}
+.p-end{text-align:center;font-size:2.35cqw;margin-top:4cqw;line-height:2.6}
+.p-end b{font-weight:700}
+.empty{color:#9AA3B2}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>검수확인서 만들기</h1>
+  <p>내용과 사진을 넣으면 초기창업패키지 [붙임4] 양식 그대로 한글(hwpx) 파일로 저장합니다.</p>
+</header>
+
+<main class="wrap">
+  <section class="form" aria-label="입력">
+    <div class="block">
+      <h2>기본 정보</h2>
+      <div class="field"><label for="f-company">창업기업명</label><input id="f-company" data-k="company" placeholder="예: 주식회사 OOO (대표자명)"></div>
+      <div class="field"><label for="f-project">과제명</label><input id="f-project" data-k="project" placeholder="협약서상 과제명"></div>
+      <div class="field"><label for="f-summary">품명</label><input id="f-summary" data-k="summary" placeholder="비워 두면 품목 목록으로 자동 작성">
+        <div class="hint" id="summary-hint">비워 두면 "첫 품목 외 N종"으로 채웁니다.</div></div>
+      <div class="field"><label for="f-qty">수량</label><input id="f-qty" data-k="qty" placeholder="예: 총 16EA"></div>
+      <div class="field"><label for="f-vendor">구입처명</label><input id="f-vendor" data-k="vendor" placeholder="거래업체명"></div>
+      <div class="field"><label for="f-amount">구입금액</label><input id="f-amount" data-k="amount" inputmode="numeric" placeholder="숫자만, 예: 1439420">
+        <div class="hint" id="amount-hint">VAT 별도 금액을 숫자로 넣어 주세요.</div></div>
+      <div class="field"><label for="f-place">납품장소</label><input id="f-place" data-k="place" placeholder="예: OO대학교 창업보육센터 000호"></div>
+      <div class="field"><label for="f-detail">상세내용</label><textarea id="f-detail" data-k="detail" placeholder="사용용도 등, 예: 시제품 구축을 위한 센서 및 통신 모듈"></textarea></div>
+    </div>
+
+    <div class="block">
+      <h2>품목과 증빙사진 <small>품목마다 사진 두 장</small></h2>
+      <div class="items" id="items"></div>
+      <button class="add" id="add-item" type="button">품목 추가</button>
+    </div>
+
+    <div class="block">
+      <h2>검수일</h2>
+      <div class="field"><label for="f-date">날짜</label><input id="f-date" type="date" data-k="date"></div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="download" type="button">hwpx 파일 받기</button>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+      <button class="reset" id="reset" type="button">입력 내용 모두 지우기</button>
+    </div>
+  </section>
+
+  <section class="preview" aria-label="미리보기">
+    <p class="preview-cap">미리보기 · 실제 쪽 나눔은 한글에서 열었을 때 기준입니다</p>
+    <div class="sheets" id="sheets"></div>
+  </section>
+</main>
+
+<script>/*__JSZIP__*/</script>
+<script>
+"use strict";
+/* ------------------------------------------------------------------ */
+/*  Static package parts (converted from the original HWP form)         */
+/* ------------------------------------------------------------------ */
+const HEADER_XML = /*__HEADER__*/"";
+const VERSION_XML = /*__VERSION__*/"";
+const CONTAINER_XML = /*__CONTAINER__*/"";
+const CONTAINER_RDF = /*__RDF__*/"";
+const MANIFEST_XML = /*__MANIFEST__*/"";
+const NS = /*__NS__*/"";
+
+/* ------------------------------------------------------------------ */
+/*  State                                                               */
+/* ------------------------------------------------------------------ */
+const FIELDS = ["company","project","summary","qty","vendor","amount","place","detail","date"];
+const STORE_KEY = "gsu-hwpx-draft-v1";
+let items = [];            // {name, photos:[{dataUrl,w,h}|null, ...]}
+let uid = 0;
+const $ = id => document.getElementById(id);
+
+function todayISO(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function val(k){return ($("f-"+k).value||"").trim()}
+function amountText(){const n=val("amount").replace(/[^0-9]/g,"");return n?"금"+Number(n).toLocaleString("ko-KR")+"원":""}
+function summaryText(){
+  const s=val("summary"); if(s) return s;
+  const named=items.map(i=>i.name.trim()).filter(Boolean);
+  if(!named.length) return "";
+  return named.length===1?named[0]:named[0]+" 외 "+(named.length-1)+"종";
+}
+function dateText(){
+  const v=val("date"); if(!v) return "20    년    월    일";
+  const [y,m,d]=v.split("-").map(Number);
+  return y+" 년  "+m+" 월  "+d+" 일";
+}
+
+/* ------------------------------------------------------------------ */
+/*  Item editor                                                         */
+/* ------------------------------------------------------------------ */
+function newItem(name=""){return {id:++uid,name,photos:[null,null]}}
+
+function renderItems(){
+  const box=$("items"); box.innerHTML="";
+  items.forEach((it,idx)=>{
+    const el=document.createElement("div"); el.className="item";
+    el.innerHTML=`
+      <div class="item-head">
+        <span class="item-no">${idx+1}</span>
+        <input aria-label="품명 ${idx+1}" placeholder="품명, 예: Gravity: NO2 Sensor [SEN0471]">
+        <button class="icon-btn" data-act="up" type="button" aria-label="위로" ${idx===0?"disabled":""}>↑</button>
+        <button class="icon-btn" data-act="down" type="button" aria-label="아래로" ${idx===items.length-1?"disabled":""}>↓</button>
+        <button class="icon-btn del" data-act="del" type="button" aria-label="품목 삭제">✕</button>
+      </div>
+      <div class="photos"></div>`;
+    const inp=el.querySelector("input"); inp.value=it.name;
+    inp.addEventListener("input",()=>{it.name=inp.value;update()});
+    el.querySelector('[data-act="up"]').onclick=()=>{[items[idx-1],items[idx]]=[items[idx],items[idx-1]];renderItems();update()};
+    el.querySelector('[data-act="down"]').onclick=()=>{[items[idx+1],items[idx]]=[items[idx],items[idx+1]];renderItems();update()};
+    el.querySelector('[data-act="del"]').onclick=()=>{
+      if((it.name||it.photos.some(Boolean)) && !confirm(`${idx+1}번 품목을 지울까요?`)) return;
+      items.splice(idx,1); if(!items.length) items.push(newItem()); renderItems(); update();
+    };
+    const ph=el.querySelector(".photos");
+    ["전체사진","상세사진"].forEach((label,pi)=>ph.appendChild(dropZone(it,pi,label)));
+    box.appendChild(el);
+  });
+}
+
+function dropZone(it,pi,label){
+  const z=document.createElement("label"); z.className="drop";
+  const file=document.createElement("input"); file.type="file"; file.accept="image/*";
+  z.appendChild(file);
+  const paint=()=>{
+    z.querySelectorAll("img,.clear,span").forEach(n=>n.remove());
+    const p=it.photos[pi];
+    if(p){
+      const img=document.createElement("img"); img.src=p.dataUrl; img.alt=label; z.appendChild(img);
+      const c=document.createElement("button"); c.type="button"; c.className="clear"; c.textContent="✕"; c.setAttribute("aria-label",label+" 지우기");
+      c.onclick=e=>{e.preventDefault();e.stopPropagation();it.photos[pi]=null;paint();update()};
+      z.appendChild(c);
+    }else{
+      const s=document.createElement("span"); s.innerHTML=label+"<br>눌러서 선택하거나 끌어다 놓기"; z.appendChild(s);
+    }
+  };
+  const take=async f=>{
+    if(!f||!f.type.startsWith("image/")) return;
+    try{it.photos[pi]=await loadPhoto(f);paint();update()}
+    catch(e){setStatus("사진을 읽지 못했습니다. JPG나 PNG 파일인지 확인해 주세요.","err")}
+  };
+  file.addEventListener("change",()=>{take(file.files[0]);file.value=""});
+  z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("over")});
+  z.addEventListener("dragleave",()=>z.classList.remove("over"));
+  z.addEventListener("drop",e=>{e.preventDefault();z.classList.remove("over");take(e.dataTransfer.files[0])});
+  paint();
+  return z;
+}
+
+/* Re-encode to JPEG (max 1800px long side) so the hwpx stays light. */
+function loadPhoto(file){
+  return new Promise((res,rej)=>{
+    const url=URL.createObjectURL(file); const img=new Image();
+    img.onload=()=>{
+      const max=1800; let w=img.naturalWidth,h=img.naturalHeight;
+      const s=Math.min(1,max/Math.max(w,h)); w=Math.round(w*s); h=Math.round(h*s);
+      const c=document.createElement("canvas"); c.width=w; c.height=h;
+      const g=c.getContext("2d"); g.fillStyle="#fff"; g.fillRect(0,0,w,h); g.drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      res({dataUrl:c.toDataURL("image/jpeg",0.88),w,h});
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);rej()};
+    img.src=url;
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  Preview                                                             */
+/* ------------------------------------------------------------------ */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const show=(s,ph)=>s?esc(s):`<span class="empty">${esc(ph)}</span>`;
+
+function groups(){ // same page grouping as the generated file: 2 items, then 3 per page
+  const g=[]; const list=items.length?items:[newItem()];
+  g.push(list.slice(0,2));
+  for(let i=2;i<list.length;i+=3) g.push(list.slice(i,i+3));
+  return g;
+}
+function picCell(p){return p?`<img src="${p.dataUrl}" alt="">`:`<span class="none">사진 없음</span>`}
+
+function renderPreview(){
+  const G=groups(); let html="";
+  G.forEach((grp,gi)=>{
+    let s=`<div class="sheet">`;
+    if(gi===0){
+      s+=`<table class="p-top"><tr><td>[붙임4]</td><td style="text-align:right">창업기업용</td></tr></table>
+      <div class="p-title"><div class="a">「초기창업패키지」</div><div class="b">검수확인서</div></div>
+      <table class="p-info">
+        <tr><td class="k">창업기업명</td><td class="c" colspan="3">${show(val("company"),"")}</td></tr>
+        <tr><td class="k">과 제 명</td><td class="c" colspan="3">${show(val("project"),"")}</td></tr>
+        <tr><td class="k">품&nbsp;&nbsp;&nbsp;명</td><td style="width:46%">${show(summaryText(),"가나다 외 N종")}</td><td class="k" style="width:16%">수&nbsp;&nbsp;&nbsp;량</td><td class="c">${show(val("qty"),"총 수량(단위)")}</td></tr>
+        <tr><td class="k">구입처 명<br>(거래업체명)</td><td colspan="3">${show(val("vendor"),"거래업체명")}</td></tr>
+        <tr><td class="k">구입금액<br>(VAT별도)</td><td colspan="3">${show(amountText(),"금0,000,000원")}</td></tr>
+        <tr><td class="k">납품장소</td><td colspan="3">${show(val("place"),"")}</td></tr>
+        <tr><td class="k">상세내용<br>(사용용도 등)</td><td colspan="3">${show(val("detail"),"")}</td></tr>
+      </table>`;
+    }
+    s+=`<table class="ph">`;
+    if(gi===0) s+=`<tr><td class="h" colspan="2">증빙사진</td></tr>`;
+    grp.forEach(it=>{
+      s+=`<tr><td class="pic">${picCell(it.photos[0])}</td><td class="pic">${picCell(it.photos[1])}</td></tr>
+          <tr><td class="cap" colspan="2">&nbsp;품명 : ${esc(it.name.trim())}</td></tr>`;
+    });
+    s+=`</table>`;
+    if(gi===G.length-1){
+      s+=`<div class="p-end">상기와 같이 검수함.<br>${esc(dateText())}<br><b>검 수 인(창업자명) :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(인)</b></div>`;
+    }
+    s+=`</div>`; html+=s;
+  });
+  $("sheets").innerHTML=html;
+}
+
+/* ------------------------------------------------------------------ */
+/*  HWPX section builder (mirrors the original form's table geometry)   */
+/* ------------------------------------------------------------------ */
+const X=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+let nidc=1000000001; const nid=()=>String(nidc++);
+
+function para(runs,ps,pageBreak=false,pid){
+  const body=runs.map(r=>Array.isArray(r)
+    ?(r[1]?`<hp:run charPrIDRef="${r[0]}"><hp:t>${X(r[1])}</hp:t></hp:run>`:`<hp:run charPrIDRef="${r[0]}"/>`)
+    :r).join("");
+  return `<hp:p id="${pid||"2147483648"}" paraPrIDRef="${ps}" styleIDRef="0" pageBreak="${pageBreak?1:0}" columnBreak="0" merged="0">${body}</hp:p>`;
+}
+function cell(r,c,w,h,bf,paras,cs=1,rs=1){
+  return `<hp:tc name="" header="0" hasMargin="0" protect="0" editable="0" dirty="0" borderFillIDRef="${bf}">`+
+    `<hp:subList id="" textDirection="HORIZONTAL" lineWrap="BREAK" vertAlign="CENTER" linkListIDRef="0" linkListNextIDRef="0" textWidth="0" textHeight="0" hasTextRef="0" hasNumRef="0">${paras.join("")}</hp:subList>`+
+    `<hp:cellAddr colAddr="${c}" rowAddr="${r}"/><hp:cellSpan colSpan="${cs}" rowSpan="${rs}"/>`+
+    `<hp:cellSz width="${w}" height="${h}"/><hp:cellMargin left="510" right="510" top="141" bottom="141"/></hp:tc>`;
+}
+function table(rows,ncols,w,bf,om){
+  const h=rows.reduce((a,r)=>a+r[0],0);
+  const trs=rows.map(r=>`<hp:tr>${r[1].join("")}</hp:tr>`).join("");
+  return `<hp:run charPrIDRef="1"><hp:tbl id="${nid()}" zOrder="0" numberingType="TABLE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" pageBreak="CELL" repeatHeader="1" rowCnt="${rows.length}" colCnt="${ncols}" cellSpacing="0" borderFillIDRef="${bf}" noAdjust="0">`+
+    `<hp:sz width="${w}" widthRelTo="ABSOLUTE" height="${h}" heightRelTo="ABSOLUTE" protect="0"/>`+
+    `<hp:pos treatAsChar="1" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="PARA" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/>`+
+    `<hp:outMargin left="${om}" right="${om}" top="${om}" bottom="${om}"/><hp:inMargin left="510" right="510" top="141" bottom="141"/>${trs}</hp:tbl></hp:run>`;
+}
+function picRun(bid,p,boxW,boxH){
+  let w=boxW,h=Math.round(boxW*p.h/p.w);
+  if(h>boxH){h=boxH;w=Math.round(boxH*p.w/p.h)}
+  const dw=p.w*75,dh=p.h*75;
+  return `<hp:run charPrIDRef="1"><hp:pic id="${nid()}" zOrder="1" numberingType="PICTURE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" href="" groupLevel="0" instid="${nid()}" reverse="0">`+
+    `<hp:offset x="0" y="0"/><hp:orgSz width="${w}" height="${h}"/><hp:curSz width="${w}" height="${h}"/><hp:flip horizontal="0" vertical="0"/>`+
+    `<hp:rotationInfo angle="0" centerX="${w>>1}" centerY="${h>>1}" rotateimage="1"/>`+
+    `<hp:renderingInfo><hc:transMatrix e1="1" e2="0" e3="0" e4="0" e5="1" e6="0"/><hc:scaMatrix e1="1" e2="0" e3="0" e4="0" e5="1" e6="0"/><hc:rotMatrix e1="1" e2="0" e3="0" e4="0" e5="1" e6="0"/></hp:renderingInfo>`+
+    `<hc:img binaryItemIDRef="${bid}" bright="0" contrast="0" effect="REAL_PIC" alpha="0"/>`+
+    `<hp:imgRect><hc:pt0 x="0" y="0"/><hc:pt1 x="${w}" y="0"/><hc:pt2 x="${w}" y="${h}"/><hc:pt3 x="0" y="${h}"/></hp:imgRect>`+
+    `<hp:imgClip left="0" right="${dw}" top="0" bottom="${dh}"/><hp:inMargin left="0" right="0" top="0" bottom="0"/>`+
+    `<hp:imgDim dimwidth="${dw}" dimheight="${dh}"/><hp:effects/>`+
+    `<hp:sz width="${w}" widthRelTo="ABSOLUTE" height="${h}" heightRelTo="ABSOLUTE" protect="0"/>`+
+    `<hp:pos treatAsChar="1" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="PARA" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/>`+
+    `<hp:outMargin left="0" right="0" top="0" bottom="0"/><hp:shapeComment>그림입니다.</hp:shapeComment></hp:pic></hp:run>`;
+}
+
+const SECPR = `<hp:run charPrIDRef="1"><hp:secPr id="" textDirection="HORIZONTAL" spaceColumns="1134" tabStop="8000" tabStopVal="4000" tabStopUnit="HWPUNIT" outlineShapeIDRef="1" memoShapeIDRef="0" textVerticalWidthHead="0" masterPageCnt="0">`+
+ `<hp:grid lineGrid="0" charGrid="0" wonggojiFormat="0"/><hp:startNum pageStartsOn="BOTH" page="0" pic="0" tbl="0" equation="0"/>`+
+ `<hp:visibility hideFirstHeader="0" hideFirstFooter="0" hideFirstMasterPage="0" border="SHOW_ALL" fill="SHOW_ALL" hideFirstPageNum="0" hideFirstEmptyLine="0" showLineNumber="0"/>`+
+ `<hp:lineNumberShape restartType="0" countBy="0" distance="0" startNumber="0"/>`+
+ `<hp:pagePr landscape="WIDELY" width="59528" height="84188" gutterType="LEFT_ONLY"><hp:margin header="1417" footer="2834" gutter="0" left="4251" right="4251" top="2834" bottom="2834"/></hp:pagePr>`+
+ `<hp:footNotePr><hp:autoNumFormat type="DIGIT" userChar="" prefixChar="" suffixChar=")" supscript="0"/><hp:noteLine length="-1" type="SOLID" width="0.12 mm" color="#000000"/><hp:noteSpacing betweenNotes="283" belowLine="567" aboveLine="850"/><hp:numbering type="CONTINUOUS" newNum="1"/><hp:placement place="EACH_COLUMN" beneathText="0"/></hp:footNotePr>`+
+ `<hp:endNotePr><hp:autoNumFormat type="DIGIT" userChar="" prefixChar="" suffixChar=")" supscript="0"/><hp:noteLine length="14692344" type="SOLID" width="0.12 mm" color="#000000"/><hp:noteSpacing betweenNotes="0" belowLine="567" aboveLine="850"/><hp:numbering type="CONTINUOUS" newNum="1"/><hp:placement place="END_OF_DOCUMENT" beneathText="0"/></hp:endNotePr>`+
+ ["BOTH","EVEN","ODD"].map(t=>`<hp:pageBorderFill type="${t}" borderFillIDRef="1" textBorder="PAPER" headerInside="0" footerInside="0" fillArea="PAPER"><hp:offset left="1417" right="1417" top="1417" bottom="1417"/></hp:pageBorderFill>`).join("")+
+ `</hp:secPr><hp:ctrl><hp:colPr id="" type="NEWSPAPER" layout="LEFT" colCount="1" sameSz="1" sameGap="0"/></hp:ctrl></hp:run>`;
+
+function buildSection(bin){
+  nidc=1000000001;
+  const parts=[];
+  // 1) header/title table — form table #1
+  parts.push(para([SECPR, table([
+    [282,[cell(0,0,24804,282,6,[para([[18,"[붙임4]"]],26)]), cell(0,1,24801,282,6,[para([[18,"창업기업용"]],27)])]],
+    [282,[cell(1,0,24804,282,7,[para([[1,""]],0)]), cell(1,1,24801,282,7,[para([[1,""]],0)])]],
+    [4800,[cell(2,0,49605,4800,8,[para([[20,"「초기창업패키지」"]],29), para([[21,"검 수 확 인 서"]],29)],2)]],
+  ],2,49605,5,283)],25,false,"0"));
+
+  // 2) info table — form table #2 (charPr 27 = filled black text, 28 = blue placeholder)
+  const L=6856,V=42861;
+  const v=(text,ph)=>text?[27,text]:[28,ph];
+  const lab=(r,txts,bf,ps=25,h=1948)=>cell(r,0,L,h,bf,txts.map(t=>para([t],ps)));
+  parts.push(para([table([
+    [1948,[lab(0,[[26,"창업기업명"]],10), cell(0,1,V,1948,11,[para([v(val("company"),"창업기업명")],30)],3)]],
+    [1948,[lab(1,[[26,"과 제 명"]],12), cell(1,1,V,1948,13,[para([v(val("project"),"과제명")],34)],3)]],
+    [1948,[lab(2,[[26,"품    명"]],12), cell(2,1,22775,1948,5,[para([v(summaryText(),"가나다 외 N종")],31)]),
+           cell(2,2,7803,1948,5,[para([[26,"수    량"]],25)]), cell(2,3,12283,1948,13,[para([v(val("qty"),"총 수량(단위)")],25)])]],
+    [3380,[lab(3,[[26,"구입처 명"],[29,"(거래업체명)"]],12,24,3380), cell(3,1,V,3380,13,[para([v(val("vendor"),"거래업체명")],31)],3)]],
+    [3380,[lab(4,[[26,"구입금액"],[26,"(VAT별도)"]],12,24,3380), cell(4,1,V,3380,13,[para([v(amountText(),"금0,000,000원")],31)],3)]],
+    [1948,[lab(5,[[26,"납품장소"]],12), cell(5,1,V,1948,13,[para([v(val("place"),"납품장소")],35)],3)]],
+    [3708,[cell(6,0,L,3708,14,[para([[26,"상세내용"]],25), para([[26,"(사용용도 등)"]],28)]),
+           cell(6,1,V,3708,15,[para([v(val("detail"),"사용용도")],31)],3)]],
+  ],4,49717,9,140)],25));
+
+  // 3) photo tables — one per page
+  const PH=18962, CAP=2010, BW=23600, BH=PH-282-200;
+  groups().forEach((grp,gi)=>{
+    const rows=[]; let r=0;
+    if(gi===0){rows.push([1482,[cell(0,0,49605,1482,8,[para([[30,"증빙사진"]],25)],2)]]); r=1}
+    grp.forEach(it=>{
+      const pc=(p,c)=>{
+        if(!p) return cell(r,c,c?24801:24804,PH,8,[para([[1,""]],25)]);
+        const bid="image"+(bin.length+1); bin.push({bid,p});
+        return cell(r,c,c?24801:24804,PH,8,[para([picRun(bid,p,BW,BH)],25)]);
+      };
+      rows.push([PH,[pc(it.photos[0],0),pc(it.photos[1],1)]]);
+      rows.push([CAP,[cell(r+1,0,49605,CAP,8,[para([[32," 품명 : "+it.name.trim()]],32)],2)]]);
+      r+=2;
+    });
+    parts.push(para([table(rows,2,49605,5,140)], gi?28:25, gi>0));
+  });
+
+  // 4) closing lines
+  ["","","","상기와 같이 검수함.","","","",dateText(),"","","","검 수 인(창업자명) :                 (인)"]
+    .forEach(t=>parts.push(para([[t.startsWith("검 수 인")?33:24,t]],28)));
+
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes" ?><hs:sec ${NS}>${parts.join("")}</hs:sec>`;
+}
+
+async function buildHwpx(){
+  const bin=[];
+  const section=buildSection(bin);
+  const manifestItems=bin.map(b=>`<opf:item id="${b.bid}" href="BinData/${b.bid}.jpg" media-type="image/jpeg" isEmbeded="1"/>`).join("");
+  const hpf=`<?xml version="1.0" encoding="UTF-8" standalone="yes" ?><opf:package ${NS} version="" unique-identifier="" id="">`+
+    `<opf:metadata><opf:title>「초기창업패키지」 검수확인서</opf:title><opf:language>ko</opf:language><opf:meta name="creator" content="text">${X(val("company"))}</opf:meta></opf:metadata>`+
+    `<opf:manifest><opf:item id="header" href="Contents/header.xml" media-type="application/xml"/>${manifestItems}`+
+    `<opf:item id="section0" href="Contents/section0.xml" media-type="application/xml"/><opf:item id="settings" href="settings.xml" media-type="application/xml"/></opf:manifest>`+
+    `<opf:spine><opf:itemref idref="header" linear="yes"/><opf:itemref idref="section0" linear="yes"/></opf:spine></opf:package>`;
+  const settings=`<?xml version="1.0" encoding="UTF-8" standalone="yes" ?><ha:HWPApplicationSetting xmlns:ha="http://www.hancom.co.kr/hwpml/2011/app" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"><ha:CaretPosition listIDRef="0" paraIDRef="0" pos="0"/></ha:HWPApplicationSetting>`;
+  const prv=["[붙임4] 창업기업용","「초기창업패키지」 검수확인서","창업기업명: "+val("company"),"과제명: "+val("project"),"품명: "+summaryText()].join("\r\n");
+
+  const zip=new JSZip(); const opt={createFolders:false};
+  zip.file("mimetype","application/hwp+zip",{compression:"STORE",createFolders:false});   // must be first & uncompressed
+  zip.file("version.xml",VERSION_XML,opt);
+  zip.file("META-INF/container.xml",CONTAINER_XML,opt);
+  zip.file("META-INF/container.rdf",CONTAINER_RDF,opt);
+  zip.file("META-INF/manifest.xml",MANIFEST_XML,opt);
+  zip.file("Contents/content.hpf",hpf,opt);
+  zip.file("Contents/header.xml",HEADER_XML,opt);
+  zip.file("Contents/section0.xml",section,opt);
+  zip.file("settings.xml",settings,opt);
+  zip.file("Preview/PrvText.txt",prv,opt);
+  bin.forEach(b=>zip.file(`BinData/${b.bid}.jpg`,b.p.dataUrl.split(",")[1],{base64:true,compression:"STORE",createFolders:false}));
+  return zip.generateAsync({type:"blob",mimeType:"application/hwp+zip",compression:"DEFLATE"});
+}
+
+/* ------------------------------------------------------------------ */
+/*  Wiring                                                              */
+/* ------------------------------------------------------------------ */
+function setStatus(msg,kind=""){const s=$("status");s.textContent=msg;s.className="status"+(kind?" "+kind:"")}
+
+function updateHints(){
+  const auto=summaryText();
+  $("summary-hint").textContent=val("summary")?"직접 입력한 품명을 씁니다.":(auto?`자동: ${auto}`:'비워 두면 "첫 품목 외 N종"으로 채웁니다.');
+  const a=amountText(); $("amount-hint").textContent=a?`VAT 별도 · ${a}으로 표기됩니다.`:"VAT 별도 금액을 숫자로 넣어 주세요.";
+}
+
+let saveTimer;
+function saveDraft(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    try{
+      const data={f:Object.fromEntries(FIELDS.map(k=>[k,$("f-"+k).value])),items:items.map(i=>i.name)};
+      localStorage.setItem(STORE_KEY,JSON.stringify(data));
+    }catch(e){}
+  },400);
+}
+function loadDraft(){
+  try{
+    const raw=localStorage.getItem(STORE_KEY); if(!raw) return false;
+    const d=JSON.parse(raw);
+    FIELDS.forEach(k=>{if(d.f&&typeof d.f[k]==="string") $("f-"+k).value=d.f[k]});
+    if(Array.isArray(d.items)&&d.items.length) items=d.items.map(n=>newItem(String(n)));
+    return true;
+  }catch(e){return false}
+}
+
+function update(){updateHints();renderPreview();saveDraft()}
+
+FIELDS.forEach(k=>$("f-"+k).addEventListener("input",update));
+$("add-item").onclick=()=>{items.push(newItem());renderItems();update();
+  const ins=$("items").querySelectorAll(".item-head input"); ins[ins.length-1].focus()};
+
+$("reset").onclick=()=>{
+  if(!confirm("입력한 내용과 사진을 모두 지울까요?")) return;
+  FIELDS.forEach(k=>$("f-"+k).value=""); $("f-date").value=todayISO();
+  items=[newItem()]; try{localStorage.removeItem(STORE_KEY)}catch(e){}
+  renderItems(); update(); setStatus("");
+};
+
+$("download").onclick=async()=>{
+  const btn=$("download");
+  const missing=items.filter(i=>i.name.trim()&&!i.photos[0]&&!i.photos[1]).length;
+  btn.disabled=true; setStatus("파일을 만드는 중입니다…");
+  try{
+    const blob=await buildHwpx();
+    const name=`[초기창업패키지] 검수확인서_${(val("company")||"창업기업").replace(/[\\/:*?"<>|]/g,"")}.hwpx`;
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    setStatus(missing?`저장했습니다. 사진이 없는 품목이 ${missing}개 있어 빈칸으로 들어갔습니다.`:"저장했습니다. 한글에서 열어 확인해 보세요.","ok");
+  }catch(e){
+    console.error(e); setStatus("파일을 만들지 못했습니다. 사진 수를 줄이거나 페이지를 새로고침한 뒤 다시 시도해 주세요.","err");
+  }finally{btn.disabled=false}
+};
+
+if(!loadDraft()) items=[newItem()];
+if(!$("f-date").value) $("f-date").value=todayISO();
+renderItems(); update();
+</script>
+</body>
+</html>
